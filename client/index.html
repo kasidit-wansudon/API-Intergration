@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html>
+  <body>
+    <div class="container">
+      <div>
+        Notification data will receive here if the app is open and focused.
+      </div>
+      <div class="message" style="min-height: 80px"></div>
+      <div>Device Token: <span class="token"></span></div>
+    </div>
+
+    <script src="https://www.gstatic.com/firebasejs/10.13.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.13.1/firebase-messaging-compat.js"></script>
+    <script type="module">
+      import { initializeApp } from "https://www.gstatic.com/firebasejs/10.13.1/firebase-app.js";
+      import { getAnalytics } from "https://www.gstatic.com/firebasejs/10.13.1/firebase-analytics.js";
+      const firebaseConfig = {
+        apiKey: "AIzaSyB2Ng7BQp1vEJMj5Fk4tb226K3tBqLqFsk",
+        authDomain: "oppo-80086.firebaseapp.com",
+        projectId: "oppo-80086",
+        storageBucket: "oppo-80086.appspot.com",
+        messagingSenderId: "108746466286",
+        appId: "1:108746466286:web:8f9fa9b50cc3244c4f24ff",
+        measurementId: "G-9V95N6D90T"
+      };
+      const projectIdKey =
+        "BHqz11SOi0lUeJbT2lefsg5IGu9I1OBHWJRIYtIPbkR1TrkYRAJW9CxOUvOeNeWbX4iL3b0evaLd5";
+      // Initialize Firebase
+      firebase.initializeApp(firebaseConfig);
+      const messaging = firebase.messaging();
+      // get token
+      messaging
+        .getToken(messaging, {
+          vapidKey: projectIdKey
+        })
+        .then((currentToken) => {
+          if (currentToken) {
+            console.log(currentToken);
+            document.querySelector(".token").innerHTML = currentToken;
+          } else {
+            console.log(
+              "No registration token available. Request permission to generate one."
+            );
+          }
+        })
+        .catch((err) => {
+          console.log("An error occurred while retrieving token. ", err);
+        });
+
+      // get message
+      messaging.onMessage((payload) => {
+        try {
+          console.log("Message received. ", payload);
+          // Handle the received message here
+        } catch (error) {
+          console.error("Error handling the message: ", error);
+          // Handle the error, for example, show an alert or log it somewhere else
+        }
+      });
+    </script>
+  </body>
+</html>
