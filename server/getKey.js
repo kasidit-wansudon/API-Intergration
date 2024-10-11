@@ -2,7 +2,7 @@ const { GoogleAuth } = require('google-auth-library');
 const path = require('path');
 
 // ระบุ path ไปยังไฟล์ JSON ที่คุณดาวน์โหลดจาก Firebase Console
-const keyPath = path.join(__dirname, './oppo-80086-fe15da6e828d.json');
+const keyPath = path.join(__dirname, './keys/oppo-colombia-staff-tools-firebase-adminsdk-tw03d-3cfecba1a4.json');
 
 async function getAccessToken() {
   const auth = new GoogleAuth({
