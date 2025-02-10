@@ -13,7 +13,7 @@ async function getAccessToken() {
   const client = await auth.getClient();
   const accessToken = await client.getAccessToken();
 
-  console.log('Access Token:', accessToken.token);
+  console.log('Access Token:', accessToken.then((e)=>e.token));
 }
 
 getAccessToken().catch(console.error);

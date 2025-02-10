@@ -1,0 +1,308 @@
+{
+	"info": {
+		"_postman_id": "your-postman-collection-id",
+		"name": "DingTalk API",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "Decrypt Callback",
+			"request": {
+				"method": "POST",
+				"header": [
+                    {
+                        "key": "Content-Type",
+                        "value": "application/json"
+                    }
+                ],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"signature\": \"your_signature\",\n    \"timestamp\": \"your_timestamp\",\n    \"nonce\": \"your_nonce\",\n    \"encrypt\": \"your_encrypted_data\"\n}"
+				},
+				"url": {
+					"raw": "http://localhost:3333/decrypt",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "3333",
+					"path": [
+						"decrypt"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Create User",
+			"request": {
+				"method": "POST",
+				"header": [
+                    {
+                        "key": "Content-Type",
+                        "value": "application/json"
+                    }
+                ],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"name\": \"Test User\",\n    \"mobile\": \"+15551234567\",\n    \"dept_id_list\": \"1\",\n    \"email\": \"testuser@example.com\"\n}"
+				},
+				"url": {
+					"raw": "http://localhost:3333/createUser",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "3333",
+					"path": [
+						"createUser"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Get User By ID",
+			"request": {
+				"method": "POST",
+				"header": [
+                     {
+                        "key": "Content-Type",
+                        "value": "application/json"
+                    }
+                ],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"userid\": \"manager123\"\n}"
+				},
+				"url": {
+					"raw": "http://localhost:3333/getUserById",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "3333",
+					"path": [
+						"getUserById"
+					]
+				}
+			},
+			"response": []
+		},
+        {
+			"name": "Get Invite Status",
+			"request": {
+				"method": "POST",
+				"header": [
+                    {
+                        "key": "Content-Type",
+                        "value": "application/json"
+                    }
+                ],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n \"userid\": \"user123\" \n}"
+				},
+				"url": {
+					"raw": "http://localhost:3333/getInviteStatus",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "3333",
+					"path": [
+						"getInviteStatus"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Send Robot Message",
+			"request": {
+				"method": "POST",
+				"header": [
+                    {
+                        "key": "Content-Type",
+                        "value": "application/json"
+                    }
+                ],
+				"body": {
+					"mode": "raw",
+                    "raw": "{\n \"msgtype\": \"text\",\n \"text\": {\n \"content\": \"Hello from Postman!\"\n },\n \"at\": {\n \"atMobiles\": [\n \"your_mobile_number\" \n ],\n \"isAtAll\": false\n }\n}"
+				},
+				"url": {
+					"raw": "http://localhost:3333/sendRobotMessage",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "3333",
+					"path": [
+						"sendRobotMessage"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Create Department",
+			"request": {
+				"method": "POST",
+				"header": [
+                    {
+                        "key": "Content-Type",
+                        "value": "application/json"
+                    }
+                ],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"name\": \"New Department\",\n    \"parent_id\": 1\n}"
+				},
+				"url": {
+					"raw": "http://localhost:3333/createDepartment",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "3333",
+					"path": [
+						"createDepartment"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Get All Users",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:3333/getAllUsers",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "3333",
+					"path": [
+						"getAllUsers"
+					]
+				}
+			},
+			"response": []
+		},
+        	{
+			"name": "Get Department By ID",
+			"request": {
+				"method": "POST",
+				"header": [
+                    {
+                        "key": "Content-Type",
+                        "value": "application/json"
+                    }
+                ],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"dept_id\": 1\n}"
+				},
+				"url": {
+					"raw": "http://localhost:3333/getDepartmentById",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "3333",
+					"path": [
+						"getDepartmentById"
+					]
+				}
+			},
+			"response": []
+		},
+        	{
+			"name": "Update Department",
+			"request": {
+				"method": "POST",
+				"header": [
+                   {
+                        "key": "Content-Type",
+                        "value": "application/json"
+                    }
+                ],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"dept_id\": 1,\n    \"name\": \"Updated Department Name\"\n}"
+				},
+				"url": {
+					"raw": "http://localhost:3333/updateDepartment",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "3333",
+					"path": [
+						"updateDepartment"
+					]
+				}
+			},
+			"response": []
+		},
+        {
+			"name": "Update User",
+			"request": {
+				"method": "POST",
+				"header": [
+                    {
+                        "key": "Content-Type",
+                        "value": "application/json"
+                    }
+                ],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"userid\": \"manager123\",\n    \"name\": \"Updated User Name\"\n}"
+				},
+				"url": {
+					"raw": "http://localhost:3333/updateUser",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "3333",
+					"path": [
+						"updateUser"
+					]
+				}
+			},
+			"response": []
+		},
+        {
+			"name": "Get User By Login Name",
+			"request": {
+				"method": "POST",
+				"header": [
+                    {
+                        "key": "Content-Type",
+                        "value": "application/json"
+                    }
+                ],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"staff_code\": \"user@example.com\",\n    \"dept_id\": 1\n}"
+				},
+				"url": {
+					"raw": "http://localhost:3333/getUserByLoginName",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "3333",
+					"path": [
+						"getUserByLoginName"
+					]
+				}
+			},
+			"response": []
+		}
+	]
+}

@@ -1,89 +1,56 @@
-const admin = require("firebase-admin");
-const express = require("express");
-const bodyParser = require("body-parser");
+// Import required modules
+const admin = require("firebase-admin"); // Firebase Admin SDK for managing FCM
+const express = require("express"); // Express framework for building web applications
+const bodyParser = require("body-parser"); // Middleware for parsing incoming request bodies
 
-const serviceAccount = require("./keys/oppo-colombia-staff-tools-firebase-adminsdk-tw03d-3cfecba1a4.json");
+// Firebase service account credentials for authentication
+const serviceAccount = require("./oppo-mexico-staff-tools-firebase-adminsdk-s2lga-c9cdb92044.json");
 
+// Initialize Firebase Admin SDK
 admin.initializeApp({
-  credential: admin.credential.cert(serviceAccount)
+  credential: admin.credential.cert(serviceAccount) // Authenticate using service account
 });
 
+// Initialize Express application
 const app = express();
-app.use(bodyParser.json());
-app.use(express.json({ limit: "500mb" }));
-app.use(express.urlencoded({ limit: "500mb", extended: true }));
+app.use(bodyParser.json()); // Parse JSON request bodies
+app.use(express.json({ limit: "500mb" })); // Handle JSON payloads with a size limit
+app.use(express.urlencoded({ limit: "500mb", extended: true })); // Handle URL-encoded payloads
 
-app.post("/fcm/send", (req, res) => {
-  const registrationToken = req.body.token;
-  const message = {
-    notification: {
-      title: "Test Message",
-      body: "This is a test message from Node.js server"
-    },
-    token: registrationToken
-  };
-
-  admin
-    .messaging()
-    .send(message)
-    .then(response => {
-      console.log("Successfully sent message:", response);
-      res.status(200).send("Message sent");
-    })
-    .catch(error => {
-      console.log("Error sending message:", error);
-      res.status(500).send("Error sending message");
-    });
-});
-
+// Define a route for FCM auto notifications
 app.post("/fcm/auto", (req, res) => {
-  if (req.body.staffList) sendMulti(req, res);
-  else sendSingle(req, res);
+  if (req.body.staffList) sendMulti(req, res); // Send notifications to multiple devices
+  else sendSingle(req, res); // Send notification to a single device
 });
 
+// Send notification to multiple devices via topic
 async function sendMulti(req, res) {
-  const registrationTokens = req.body.staffList;
-  const topic = `topic${req.body.push_insert}`;
-  const req_mes = req.body;
+  const registrationToken = req.body.message.token; // Individual token for direct notification
+  const registrationTokens = req.body.staffList; // List of device tokens to subscribe to a topic
+  const topic = `topic${req.body.push_insert}`; // Topic name dynamically generated
+  const req_mes = req.body.message; // Extract message details from the request
+
+  // Prepare subscription data
   const subscriptionTokens = {
     status: "send subscription",
     tokens: registrationTokens,
     topic: topic
   };
 
+  // Subscribe tokens to the topic
   var sub = await subscribe(subscriptionTokens, res);
-  if (sub != 200) return;
+  if (sub != 200) return; // Stop if subscription fails
+
+  // Define notification content
   const notification = {
     title: req_mes.title,
     body: req_mes.content
   };
+
+  // Define FCM message payload
   const message = {
     topic: topic,
-    apns: {
-      payload: {
-        aps: {
-          alert: notification,
-          sound: "default"
-        }
-      },
-      fcm_options: {
-        image: req_mes.image
-      }
-    },
-    // data: req_mes.data,
-    notification: notification
-  };
-
-  sendToTopic({ req: subscriptionTokens, message: message }, res);
-}
-
-function sendSingle(req, res) {
-  const registrationToken = req.body.message.token;
-  const req_mes = req.body.message;
-
-  const message = {
-    token: registrationToken,
-    apns: {
+    apns: { // APNs (iOS) specific configuration
       payload: {
         aps: {
           alert: {
@@ -94,132 +61,113 @@ function sendSingle(req, res) {
         }
       },
       fcm_options: {
-        image: req_mes.notification.image
+        image: req_mes.notification.image // Optional notification image
       }
     },
-    data: req_mes.data,
-    notification: req_mes.notification
+    data: req_mes.data, // Custom data payload
+    notification: req_mes.notification // Notification details
   };
 
+  // Send the message to the topic
+  sendToTopic({ req: subscriptionTokens, message: message }, res);
+}
+
+// Send notification to a single device
+function sendSingle(req, res) {
+  const registrationToken = req.body.message.token; // Device token
+  const req_mes = req.body.message; // Extract message details
+
+  // Define FCM message payload for a single device
+  const message = {
+    token: registrationToken, // Target device token
+    apns: { // APNs (iOS) specific configuration
+      payload: {
+        aps: {
+          alert: {
+            title: req_mes.notification.title,
+            body: req_mes.notification.body
+          },
+          sound: "default"
+        }
+      },
+      fcm_options: {
+        image: req_mes.notification.image // Optional notification image
+      }
+    },
+    data: req_mes.data, // Custom data payload
+    notification: req_mes.notification // Notification details
+  };
+
+  // Send the message
   send(message, res);
 }
 
+// Send a message via Firebase Messaging
 function send(message, res) {
   admin
     .messaging()
-    .send(message)
+    .send(message) // Send the message using Firebase Admin SDK
     .then(response => {
-      console.log(JSON.stringify(message, null, 2));
-      res.status(200).send(response);
+      res.status(200).send(response); // Respond with success
     })
     .catch(error => {
       console.log("Error sending message:", error);
-      res.status(500).send("Error sending notification");
+      res.status(500).send("Error sending notification"); // Respond with error
     });
 }
 
+// Subscribe device tokens to a topic
 function subscribe(req, res) {
   const { tokens, topic } = req;
 
-  // Subscribe the device token to the topic
   return admin
     .messaging()
-    .subscribeToTopic(tokens, topic)
+    .subscribeToTopic(tokens, topic) // Subscribe tokens to the topic
     .then(response => {
-      return 200;
+      console.log(`subscribe topic:${topic} ${tokens.length}`);
+      return 200; // Return success status
     })
     .catch(error => {
-      // return error;
       console.log("Error subscribing to topic:", error);
-      res.status(500).send("Error subscribing to topic");
+      res.status(500).send("Error subscribing to topic"); // Respond with error
     });
 }
 
+// Unsubscribe device tokens from a topic
 function unsubscribe(req, res) {
   const { tokens, topic } = req;
+
   admin
     .messaging()
-    .unsubscribeFromTopic(tokens, topic)
+    .unsubscribeFromTopic(tokens, topic) // Unsubscribe tokens from the topic
     .then(response => {
-      console.log("Successfully subscribed to topic:", response);
-      res.status(200).send("Successfully subscribed to topic");
+      console.log("Successfully unsubscribed to topic:", response);
+      res.status(200).send("Successfully subscribed to topic"); // Respond with success
     })
     .catch(error => {
       console.log("Error subscribing to topic:", error);
-      res.status(500).send("Error subscribing to topic");
+      res.status(500).send("Error subscribing to topic"); // Respond with error
     });
 }
 
+// Send a message to a topic
 function sendToTopic(message, res) {
-  message.status = "send to topic";
+  message.status = "send to topic"; // Update status for logging
   admin
     .messaging()
-    .send(message.message)
+    .send(message.message) // Send the message to the topic
     .then(response => {
-      unsubscribe(message.req, res);
-    })
-    .catch(error => {
-      unsubscribe(message.req, res);
-    });
-}
-
-app.post("/subscribe-to-topic", (req, res) => {
-  const { tokens, topic } = req.body;
-
-  admin
-    .messaging()
-    .subscribeToTopic(tokens, topic)
-    .then(response => {
-      console.log("Successfully subscribed to topic:", response);
-      res.status(200).send("Successfully subscribed to topic");
-    })
-    .catch(error => {
-      console.log("Error subscribing to topic:", error);
-      res.status(500).send("Error subscribing to topic");
-    });
-});
-
-app.post("/unsubscribe-to-topic", (req, res) => {
-  const { tokens, topic } = req.body;
-
-  admin
-    .messaging()
-    .unsubscribeFromTopic(tokens, topic)
-    .then(response => {
-      console.log("Successfully subscribed to topic:", response);
-      res.status(200).send("Successfully subscribed to topic");
-    })
-    .catch(error => {
-      console.log("Error subscribing to topic:", error);
-      res.status(500).send("Error subscribing to topic");
-    });
-});
-
-app.post("/send-to-topic", (req, res) => {
-  const { topic } = req.body;
-
-  const message = {
-    notification: {
-      title: "Breaking News From Webhook",
-      body: 'This is a message to all subscribers of the "news" topic.'
-    },
-    topic: topic
-  };
-
-  admin
-    .messaging()
-    .send(message)
-    .then(response => {
-      console.log("Successfully sent message:", response);
-      res.status(200).send("Successfully sent message to topic");
+      console.log("Successfully sent to topic message:", JSON.stringify(message, 2, null), response);
+      unsubscribe(message.req, res); // Unsubscribe tokens after message is sent
     })
     .catch(error => {
       console.log("Error sending message:", error);
-      res.status(500).send("Error sending to topic");
+      unsubscribe(message.req, res); // Unsubscribe tokens if sending fails
     });
-});
+}
 
-const port = process.env.PORT || 3039;
+// Start the Express server
+const port = 888; // Define the port for the server
 app.listen(port, () => {
-  console.log(`Server listening on port ${port}`);
+  console.log(`Server listening on port ${port}`); // Log server start
 });
